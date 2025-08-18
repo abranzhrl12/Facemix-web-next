@@ -1,0 +1,12 @@
+---
+description:
+globs: .tsx,ts
+alwaysApply: false
+---
+-usar next 15 seimpre
+-Usan siempre bun para los paquetes
+-crear compoenntes son .scss para los estilos
+-trata de usar shadwcn pero migrar a .scss
+-Aplicar Principios solid
+-proyecto mantenible escalable optimizado
+-aplicar singleton para apis

@@ -1,0 +1,365 @@
+// Variables
+$primary-color: #2563eb;
+$primary-hover: #1d4ed8;
+$success-color: #059669;
+$error-color: #dc2626;
+$warning-color: #d97706;
+$text-primary: #1f2937;
+$text-secondary: #6b7280;
+$border-color: #d1d5db;
+$background-light: #f9fafb;
+$shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+
+// Mixins
+@mixin flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@mixin flex-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+@mixin input-base {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid $border-color;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  transition: all 0.2s ease;
+  
+  &:focus {
+    outline: none;
+    border-color: $primary-color;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+  }
+  
+  &:disabled {
+    background-color: $background-light;
+    cursor: not-allowed;
+  }
+}
+
+@mixin button-base {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+// Estilos principales
+.personRegistrationForm {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 2rem;
+  background: white;
+  border-radius: 1rem;
+  box-shadow: $shadow;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 2rem;
+  
+  .title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: $text-primary;
+    margin-bottom: 0.5rem;
+  }
+  
+  .subtitle {
+    font-size: 1.1rem;
+    color: $text-secondary;
+    line-height: 1.5;
+  }
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+// Secciones del formulario
+.formSection {
+  border: 1px solid $border-color;
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+  background: $background-light;
+  
+  .sectionTitle {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: $text-primary;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid $primary-color;
+  }
+}
+
+// Filas de campos
+.formRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+// Grupos de campos
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  
+  .label {
+    font-weight: 600;
+    color: $text-primary;
+    font-size: 0.9rem;
+    
+    .required {
+      color: $error-color;
+      margin-left: 0.25rem;
+    }
+  }
+  
+  .input,
+  .select {
+    @include input-base;
+  }
+  
+  .select {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+    background-position: right 0.5rem center;
+    background-repeat: no-repeat;
+    background-size: 1.5em 1.5em;
+    padding-right: 2.5rem;
+  }
+}
+
+// Zona de subida de imagen
+.imageUploadSection {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.dropZone {
+  border: 2px dashed $border-color;
+  border-radius: 0.75rem;
+  padding: 2rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: white;
+  
+  &:hover {
+    border-color: $primary-color;
+    background: rgba(37, 99, 235, 0.05);
+  }
+  
+  &.dragOver {
+    border-color: $primary-color;
+    background: rgba(37, 99, 235, 0.1);
+    transform: scale(1.02);
+  }
+}
+
+.dropZoneContent {
+  @include flex-center;
+  flex-direction: column;
+  gap: 1rem;
+  
+  .dropZoneIcon {
+    font-size: 3rem;
+    color: $text-secondary;
+  }
+  
+  .dropZoneText {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: $text-primary;
+    margin: 0;
+  }
+  
+  .dropZoneSubtext {
+    font-size: 0.9rem;
+    color: $text-secondary;
+    margin: 0;
+  }
+}
+
+.imagePreview {
+  position: relative;
+  display: inline-block;
+  
+  img {
+    max-width: 200px;
+    max-height: 200px;
+    border-radius: 0.5rem;
+    object-fit: cover;
+  }
+  
+  .imageOverlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    @include flex-center;
+    border-radius: 0.5rem;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    
+    span {
+      font-weight: 600;
+      text-align: center;
+    }
+  }
+  
+  &:hover .imageOverlay {
+    opacity: 1;
+  }
+}
+
+.hiddenInput {
+  display: none;
+}
+
+.imageInfo {
+  background: white;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  border: 1px solid $border-color;
+  
+  p {
+    margin: 0.25rem 0;
+    font-size: 0.9rem;
+    color: $text-secondary;
+  }
+  
+  .removeImageButton {
+    @include button-base;
+    background: $error-color;
+    color: white;
+    margin-top: 0.5rem;
+    
+    &:hover:not(:disabled) {
+      background: darken($error-color, 10%);
+    }
+  }
+}
+
+// Mensajes de estado
+.errorMessage,
+.successMessage {
+  padding: 1rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  text-align: center;
+}
+
+.errorMessage {
+  background: rgba(220, 38, 38, 0.1);
+  color: $error-color;
+  border: 1px solid rgba(220, 38, 38, 0.3);
+}
+
+.successMessage {
+  background: rgba(5, 150, 105, 0.1);
+  color: $success-color;
+  border: 1px solid rgba(5, 150, 105, 0.3);
+}
+
+// Botones de acción
+.formActions {
+  @include flex-between;
+  gap: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid $border-color;
+  
+  @media (max-width: 768px) {
+    flex-direction: column;
+  }
+}
+
+.cancelButton {
+  @include button-base;
+  background: $text-secondary;
+  color: white;
+  
+  &:hover:not(:disabled) {
+    background: darken($text-secondary, 10%);
+  }
+}
+
+.submitButton {
+  @include button-base;
+  background: $primary-color;
+  color: white;
+  
+  &:hover:not(:disabled) {
+    background: $primary-hover;
+  }
+}
+
+// Spinner de carga
+.loadingSpinner {
+  @include flex-center;
+  gap: 0.5rem;
+  
+  .spinner {
+    width: 1rem;
+    height: 1rem;
+    border: 2px solid transparent;
+    border-top: 2px solid currentColor;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+// Responsive
+@media (max-width: 640px) {
+  .personRegistrationForm {
+    padding: 1rem;
+    margin: 1rem;
+  }
+  
+  .formSection {
+    padding: 1rem;
+  }
+  
+  .header .title {
+    font-size: 1.5rem;
+  }
+  
+  .dropZone {
+    padding: 1.5rem;
+  }
+  
+  .dropZoneContent .dropZoneIcon {
+    font-size: 2rem;
+  }
+}

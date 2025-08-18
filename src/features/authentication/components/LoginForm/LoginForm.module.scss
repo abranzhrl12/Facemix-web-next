@@ -1,0 +1,323 @@
+// Variables SCSS
+$primary-color: #2563eb;
+$primary-hover: #1d4ed8;
+$secondary-color: #64748b;
+$success-color: #10b981;
+$error-color: #ef4444;
+$warning-color: #f59e0b;
+$background-color: #ffffff;
+$border-color: #e2e8f0;
+$text-primary: #1e293b;
+$text-secondary: #64748b;
+$shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+$shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+$shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+
+// Mixins
+@mixin flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@mixin input-focus {
+  outline: none;
+  border-color: $primary-color;
+  box-shadow: 0 0 0 3px rgb(37 99 235 / 0.1);
+}
+
+@mixin button-reset {
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+@mixin responsive($breakpoint) {
+  @if $breakpoint == tablet {
+    @media (min-width: 768px) { @content; }
+  } @else if $breakpoint == desktop {
+    @media (min-width: 1024px) { @content; }
+  } @else if $breakpoint == large {
+    @media (min-width: 1280px) { @content; }
+  }
+}
+
+// Estilos principales
+.loginForm {
+  width: 100%;
+  max-width: 400px;
+  margin: 0 auto;
+  padding: 2rem;
+  background: $background-color;
+  border-radius: 12px;
+  box-shadow: $shadow-lg;
+  border: 1px solid $border-color;
+
+  @include responsive(tablet) {
+    max-width: 450px;
+    padding: 2.5rem;
+  }
+
+  @include responsive(desktop) {
+    max-width: 500px;
+    padding: 3rem;
+  }
+}
+
+// Header
+.header {
+  text-align: center;
+  margin-bottom: 2rem;
+
+  .title {
+    font-size: 1.875rem;
+    font-weight: 700;
+    color: $text-primary;
+    margin: 0 0 0.5rem 0;
+    line-height: 1.2;
+
+    @include responsive(tablet) {
+      font-size: 2.25rem;
+    }
+  }
+
+  .subtitle {
+    font-size: 1rem;
+    color: $text-secondary;
+    margin: 0;
+    line-height: 1.5;
+  }
+}
+
+// Formulario
+.form {
+  .errorMessage {
+    background: rgb(239 68 68 / 0.1);
+    border: 1px solid rgb(239 68 68 / 0.2);
+    color: $error-color;
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+    font-size: 0.875rem;
+    text-align: center;
+  }
+}
+
+// Grupos de formulario
+.formGroup {
+  margin-bottom: 1.5rem;
+
+  .label {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: $text-primary;
+    margin-bottom: 0.5rem;
+    line-height: 1.4;
+  }
+
+  .input {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 1px solid $border-color;
+    border-radius: 8px;
+    font-size: 1rem;
+    color: $text-primary;
+    background: $background-color;
+    transition: all 0.2s ease-in-out;
+    box-sizing: border-box;
+
+    &::placeholder {
+      color: $text-secondary;
+    }
+
+    &:focus {
+      @include input-focus;
+    }
+
+    &:disabled {
+      background: rgb(241 245 249);
+      color: $text-secondary;
+      cursor: not-allowed;
+    }
+
+    &.error {
+      border-color: $error-color;
+      box-shadow: 0 0 0 3px rgb(239 68 68 / 0.1);
+    }
+  }
+}
+
+// Contenedor de contraseña
+.passwordContainer {
+  position: relative;
+  display: flex;
+  align-items: center;
+
+  .input {
+    padding-right: 3rem;
+  }
+
+  .passwordToggle {
+    @include button-reset;
+    position: absolute;
+    right: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    padding: 0.25rem;
+    border-radius: 4px;
+    transition: background-color 0.2s ease-in-out;
+    font-size: 1.125rem;
+
+    &:hover:not(:disabled) {
+      background: rgb(241 245 249);
+    }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+}
+
+// Botón de envío
+.submitButton {
+  width: 100%;
+  padding: 0.875rem 1.5rem;
+  background: $primary-color;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  margin-top: 0.5rem;
+
+  &:hover:not(:disabled) {
+    background: $primary-hover;
+    transform: translateY(-1px);
+    box-shadow: $shadow-md;
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY(0);
+  }
+
+  &:disabled {
+    background: $secondary-color;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+  }
+
+  .loadingSpinner {
+    @include flex-center;
+    gap: 0.5rem;
+
+    .spinner {
+      width: 1rem;
+      height: 1rem;
+      border: 2px solid transparent;
+      border-top: 2px solid currentColor;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+  }
+}
+
+// Footer
+.footer {
+  margin-top: 2rem;
+  text-align: center;
+
+  .switchButton {
+    @include button-reset;
+    color: $primary-color;
+    font-size: 0.875rem;
+    text-decoration: underline;
+    transition: color 0.2s ease-in-out;
+
+    &:hover:not(:disabled) {
+      color: $primary-hover;
+    }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+}
+
+// Animaciones
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+// Estados de hover y focus
+.formGroup:hover .label {
+  color: $primary-color;
+}
+
+// Responsive adicional
+@include responsive(tablet) {
+  .loginForm {
+    .header .title {
+      font-size: 2.25rem;
+    }
+  }
+}
+
+@include responsive(desktop) {
+  .loginForm {
+    .header .title {
+      font-size: 2.5rem;
+    }
+  }
+}
+
+// Modo oscuro (opcional)
+@media (prefers-color-scheme: dark) {
+  .loginForm {
+    background: #1e293b;
+    border-color: #334155;
+    color: #f1f5f9;
+
+    .header .title {
+      color: #f1f5f9;
+    }
+
+    .header .subtitle {
+      color: #94a3b8;
+    }
+
+    .formGroup .label {
+      color: #f1f5f9;
+    }
+
+    .formGroup .input {
+      background: #334155;
+      border-color: #475569;
+      color: #f1f5f9;
+
+      &::placeholder {
+        color: #94a3b8;
+      }
+
+      &:disabled {
+        background: #475569;
+        color: #94a3b8;
+      }
+    }
+
+    .passwordToggle:hover:not(:disabled) {
+      background: #475569;
+    }
+  }
+}
