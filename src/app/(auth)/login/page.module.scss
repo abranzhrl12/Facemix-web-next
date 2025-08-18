@@ -1,0 +1,216 @@
+// Variables SCSS
+$primary-color: #2563eb;
+$background-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+$text-light: #ffffff;
+$text-dark: #1e293b;
+$shadow-lg: 0 25px 50px -12px rgb(0 0 0 / 0.25);
+$border-color: #e2e8f0;
+$text-secondary: #64748b;
+
+// Mixins
+@mixin flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@mixin responsive($breakpoint) {
+  @if $breakpoint == tablet {
+    @media (min-width: 768px) { @content; }
+  } @else if $breakpoint == desktop {
+    @media (min-width: 1024px) { @content; }
+  } @else if $breakpoint == large {
+    @media (min-width: 1280px) { @content; }
+  }
+}
+
+// Página principal
+.loginPage {
+  min-height: 100vh;
+  background: $background-gradient;
+  @include flex-center;
+  padding: 1rem;
+
+  @include responsive(tablet) {
+    padding: 2rem;
+  }
+
+  @include responsive(desktop) {
+    padding: 3rem;
+  }
+}
+
+// Contenedor principal
+.container {
+  width: 100%;
+  max-width: 1200px;
+  @include flex-center;
+  flex-direction: column;
+  gap: 3rem;
+
+  @include responsive(tablet) {
+    gap: 4rem;
+  }
+
+  @include responsive(desktop) {
+    gap: 5rem;
+  }
+}
+
+// Logo y título
+.logo {
+  text-align: center;
+  color: $text-light;
+
+  h1 {
+    font-size: 3rem;
+    font-weight: 800;
+    margin: 0;
+    text-shadow: 0 4px 8px rgb(0 0 0 / 0.3);
+    letter-spacing: -0.025em;
+    line-height: 1;
+
+    @include responsive(tablet) {
+      font-size: 4rem;
+    }
+
+    @include responsive(desktop) {
+      font-size: 5rem;
+    }
+
+    @include responsive(large) {
+      font-size: 6rem;
+    }
+  }
+
+  p {
+    font-size: 1.25rem;
+    margin: 1rem 0 0 0;
+    opacity: 0.9;
+    font-weight: 500;
+    text-shadow: 0 2px 4px rgb(0 0 0 / 0.3);
+
+    @include responsive(tablet) {
+      font-size: 1.5rem;
+    }
+
+    @include responsive(desktop) {
+      font-size: 1.75rem;
+    }
+  }
+}
+
+// Animaciones
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.logo {
+  animation: fadeInDown 0.8s ease-out;
+}
+
+// Responsive adicional
+@include responsive(tablet) {
+  .container {
+    flex-direction: row;
+    align-items: stretch;
+    gap: 4rem;
+  }
+
+  .logo {
+    flex: 1;
+    text-align: left;
+    padding-right: 2rem;
+  }
+}
+
+@include responsive(desktop) {
+  .container {
+    gap: 6rem;
+  }
+
+  .logo {
+    padding-right: 3rem;
+  }
+}
+
+// Modo oscuro (opcional)
+@media (prefers-color-scheme: dark) {
+  .loginPage {
+    background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+  }
+}
+
+// Efectos de hover
+.logo h1 {
+  transition: transform 0.3s ease-in-out;
+
+  &:hover {
+    transform: scale(1.05);
+  }
+}
+
+// Componente de carga
+.loadingContainer {
+  @include flex-center;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 2rem;
+  background: $background-gradient;
+  border-radius: 12px;
+  box-shadow: $shadow-lg;
+  border: 1px solid $border-color;
+  min-height: 200px;
+
+  .spinner {
+    width: 2rem;
+    height: 2rem;
+    border: 3px solid $border-color;
+    border-top: 3px solid $primary-color;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+
+  p {
+    color: $text-secondary;
+    font-size: 1rem;
+    margin: 0;
+  }
+}
+
+// Media queries para dispositivos móviles
+@media (max-width: 480px) {
+  .loginPage {
+    padding: 0.5rem;
+  }
+
+  .container {
+    gap: 2rem;
+  }
+
+  .logo h1 {
+    font-size: 2.5rem;
+  }
+
+  .logo p {
+    font-size: 1rem;
+  }
+}
