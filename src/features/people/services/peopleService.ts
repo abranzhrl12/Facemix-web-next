@@ -61,7 +61,7 @@ export class PeopleService {
       }
 
       // Realizar la petición al backend
-      const response = await fetch(`${this.baseUrl}/face-recognition/register-person-with-image`, {
+      const response = await fetch(`${this.baseUrl}/api/v2/person-management/register-person-with-image`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${session.access_token}`,
