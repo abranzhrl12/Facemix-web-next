@@ -126,39 +126,49 @@ export const PersonRegistrationForm: React.FC<PersonRegistrationFormProps> = ({
         imagen,
       });
 
-              if (result.success) {
-          // Crear mensaje de éxito con información del embedding
-          let successMessage = result.message;
-          if (result.embedding_created) {
-            successMessage += ` ✅ Embedding facial generado exitosamente`;
-            if (result.processing_time_ms) {
-              successMessage += ` (${result.processing_time_ms}ms)`;
-            }
-          } else if (result.warning) {
-            successMessage += ` ⚠️ ${result.warning}`;
+      if (result.success) {
+        // Crear mensaje de éxito con información del embedding
+        let successMessage = result.message;
+        if (result.embedding_created) {
+          successMessage += ` ✅ Embedding facial generado exitosamente`;
+          if (result.processing_time_ms) {
+            successMessage += ` (${result.processing_time_ms}ms)`;
           }
-          
-          setSuccess(successMessage);
-          setFormData({
-            dni: '',
-            nombre: '',
-            apellido_paterno: '',
-            apellido_materno: '',
-            fecha_nacimiento: '',
-            genero: 'M',
-            direccion: '',
-          });
-          setImagen(null);
-          setImagenPreview('');
-          
-          if (onSuccess && result.person_id) {
-            onSuccess(result.person_id);
-          }
-        } else {
-          setError(result.message);
+        } else if (result.warning) {
+          successMessage += ` ⚠️ ${result.warning}`;
         }
+        
+        setSuccess(successMessage);
+        setFormData({
+          dni: '',
+          nombre: '',
+          apellido_paterno: '',
+          apellido_materno: '',
+          fecha_nacimiento: '',
+          genero: 'M',
+          direccion: '',
+        });
+        setImagen(null);
+        setImagenPreview('');
+        
+        if (onSuccess && result.person_id) {
+          onSuccess(result.person_id);
+        }
+      } else {
+        console.error("❌ Error en el registro:", result.message);
+        setError(result.message || 'Error al registrar la persona');
+      }
     } catch (error) {
-      setError('Error inesperado al registrar la persona');
+      console.error("❌ Error inesperado:", error);
+      let errorMessage = 'Error inesperado al registrar la persona';
+      
+      if (error instanceof Error) {
+        errorMessage = error.message;
+      } else if (typeof error === 'string') {
+        errorMessage = error;
+      }
+      
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }

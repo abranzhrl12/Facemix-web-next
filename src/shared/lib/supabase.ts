@@ -17,8 +17,18 @@ export class SupabaseService implements ISupabaseClient {
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
     const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
+    console.log("🔧 Configurando Supabase:", {
+      hasUrl: !!supabaseUrl,
+      hasKey: !!supabaseAnonKey,
+      url: supabaseUrl ? `${supabaseUrl.substring(0, 20)}...` : 'No configurado',
+    });
+
     if (!supabaseUrl || !supabaseAnonKey) {
       console.warn('⚠️ Variables de entorno de Supabase no encontradas');
+      console.warn('📝 Crea un archivo .env.local con las siguientes variables:');
+      console.warn('   NEXT_PUBLIC_SUPABASE_URL=tu_url_de_supabase');
+      console.warn('   NEXT_PUBLIC_SUPABASE_ANON_KEY=tu_clave_anonima_de_supabase');
+      
       // Crear un cliente dummy que simule todos los métodos necesarios
       this.client = this.createDummyClient();
       return;
@@ -31,6 +41,8 @@ export class SupabaseService implements ISupabaseClient {
         detectSessionInUrl: true,
       },
     });
+    
+    console.log("✅ Cliente Supabase configurado correctamente");
   }
 
   // Método para crear un cliente dummy funcional
@@ -46,6 +58,29 @@ export class SupabaseService implements ISupabaseClient {
     // Agregar métodos dummy para evitar errores
     const enhancedClient = {
       ...dummyClient,
+      auth: {
+        ...dummyClient.auth,
+        getSession: () => Promise.resolve({
+          data: {
+            session: {
+              access_token: 'dummy-token-for-testing',
+              refresh_token: 'dummy-refresh-token',
+              expires_at: Date.now() + 3600000, // 1 hora
+              user: {
+                id: 'dummy-user-id',
+                email: 'test@example.com',
+                created_at: new Date().toISOString(),
+              }
+            }
+          },
+          error: null
+        }),
+        signInWithPassword: () => Promise.resolve({
+          data: { user: null, session: null },
+          error: { message: 'Supabase no está configurado. Configura las variables de entorno.' }
+        }),
+        signOut: () => Promise.resolve({ error: null })
+      },
       from: (table: string) => ({
         select: () => ({
           eq: () => ({
