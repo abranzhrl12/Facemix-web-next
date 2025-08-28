@@ -155,23 +155,53 @@ export const useAuth = (): IUseAuth => {
     }
   }, [updateState]);
 
-  // Efecto para verificar la sesión al cargar (DESHABILITADO COMPLETAMENTE)
+  // Efecto para verificar la sesión al cargar
   useEffect(() => {
-    // NO hacer NADA al cargar para evitar problemas de SSR
-    console.log('🚫 Hook useAuth cargado - NO verificando nada automáticamente');
+    let isMounted = true;
     
-    // Solo verificar si las variables están ahí (sin hacer nada más)
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-    const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-    console.log('🔍 Variables de entorno:', { 
-      tieneUrl: !!supabaseUrl, 
-      tieneKey: !!supabaseAnonKey,
-      url: supabaseUrl ? '✅' : '❌',
-      key: supabaseAnonKey ? '✅' : '❌'
-    });
-    
-    updateState({ loading: false, error: null });
+    const checkSession = async () => {
+      try {
+        console.log('🔍 useAuth - Verificando sesión actual...');
+        
+        // Verificar si hay una sesión activa
+        const session = await authService.getCurrentSession();
+        const user = await authService.getCurrentUser();
+        
+        // Verificar si el componente sigue montado antes de actualizar el estado
+        if (!isMounted) return;
+        
+        console.log('📋 useAuth - Sesión encontrada:', !!session, 'Usuario:', !!user);
+        
+        if (session && user) {
+          console.log('✅ useAuth - Usuario autenticado encontrado:', user.email);
+          updateState({ user, session, loading: false, error: null });
+        } else {
+          console.log('ℹ️ useAuth - No hay sesión activa');
+          updateState({ user: null, session: null, loading: false, error: null });
+        }
+      } catch (error) {
+        console.error('❌ useAuth - Error verificando sesión:', error);
+        if (isMounted) {
+          updateState({ loading: false, error: null });
+        }
+      }
+    };
+
+    checkSession();
+
+    // Cleanup function para evitar actualizaciones de estado en componentes desmontados
+    return () => {
+      isMounted = false;
+    };
   }, [updateState]);
+
+  // Efecto para detectar cuando el usuario se autentica exitosamente
+  useEffect(() => {
+    if (state.user && state.session && !state.loading) {
+      console.log('🎯 Usuario autenticado exitosamente, notificando cambio de estado');
+      // Este efecto se ejecuta cuando el usuario se autentica
+    }
+  }, [state.user, state.session, state.loading]);
 
   // Computed properties (LSP)
   const isAuthenticated = !!state.user && !!state.session;

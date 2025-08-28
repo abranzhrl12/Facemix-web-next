@@ -24,6 +24,76 @@ export interface PersonRegistrationResponse {
   error?: string;
 }
 
+// Interface para agregar imagen a persona
+export interface AddImageToPersonRequest {
+  personId: string;
+  file: File;
+}
+
+// Interface para la respuesta de agregar imagen
+export interface AddImageToPersonResponse {
+  success: boolean;
+  message: string;
+  personId?: string;
+  embeddingId?: string;
+  processing_time_ms?: number;
+  error?: string;
+}
+
+// Interface para una persona
+export interface Person {
+  id: string;
+  dni: string;
+  nombre_completo: string;
+  fecha_nacimiento: string;
+  genero: string;
+  direccion: string;
+  estado: string;
+  created_at: string;
+  updated_at: string;
+}
+
+// Interface para la respuesta de obtener todas las personas
+export interface GetAllPersonsResponse {
+  success: boolean;
+  data?: Person[];
+  message?: string;
+  error?: string;
+}
+
+// Interface para imagen de referencia
+export interface ReferenceImage {
+  id: string;
+  image_url: string;
+  description: string;
+  confidence_level: number;
+  is_primary: boolean;
+  created_at: string;
+}
+
+// Interface para persona con detalles completos
+export interface PersonDetail {
+  id: string;
+  dni: string;
+  nombre_completo: string;
+  fecha_nacimiento: string;
+  genero: string;
+  direccion: string;
+  estado: string;
+  embeddings_count: number;
+  reference_images: ReferenceImage[];
+  created_at: string;
+  updated_at: string;
+}
+
+// Interface para la respuesta de obtener persona por ID
+export interface GetPersonByIdResponse {
+  success: boolean;
+  data?: PersonDetail;
+  message?: string;
+  error?: string;
+}
+
 // Servicio para manejar personas
 export class PeopleService {
   private baseUrl =
@@ -267,7 +337,381 @@ export class PeopleService {
     const age = today.getFullYear() - birthDate.getFullYear();
     return age >= 0 && age <= 120;
   }
-}
+
+  // Método para agregar imagen a una persona existente
+  async addImageToPerson(
+    request: AddImageToPersonRequest
+  ): Promise<AddImageToPersonResponse> {
+    try {
+      console.log("📸 Iniciando adición de imagen a persona:", {
+        personId: request.personId,
+        fileName: request.file.name,
+        fileSize: request.file.size,
+      });
+
+      // Obtener el token de autenticación de Supabase
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      if (!session?.access_token) {
+        throw new Error("No hay sesión activa");
+      }
+
+      // Crear FormData para enviar al backend
+      const formData = new FormData();
+      formData.append("file", request.file);
+
+      // Logging detallado de todos los campos que se envían
+      console.log("📤 Datos completos que se envían al backend:");
+      for (let [key, value] of formData.entries()) {
+        if (value instanceof File) {
+          console.log(
+            `  ${key}: [File] ${value.name} (${value.size} bytes, ${value.type})`
+          );
+        } else {
+          console.log(`  ${key}: "${value}"`);
+        }
+      }
+
+      const fullUrl = `${this.baseUrl}/api/v2/embeddings/person/${request.personId}/add-image`;
+      console.log("📤 Enviando imagen al backend:", {
+        url: fullUrl,
+        baseUrl: this.baseUrl,
+        personId: request.personId,
+        fileName: request.file.name,
+        fileSize: request.file.size,
+        method: 'POST',
+        hasAuthToken: !!session?.access_token
+      });
+
+      // Realizar la petición al backend
+      const response = await fetch(fullUrl, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${session.access_token}`,
+        },
+        body: formData,
+      });
+
+      console.log("📥 Respuesta del backend:", {
+        status: response.status,
+        statusText: response.statusText,
+        ok: response.ok,
+        url: response.url,
+        headers: Object.fromEntries(response.headers.entries())
+      });
+
+      if (!response.ok) {
+        let errorMessage = `Error ${response.status}: ${response.statusText}`;
+
+        try {
+          const errorData = await response.json();
+          console.log("📋 Datos de error del backend:", errorData);
+
+          if (errorData.detail) {
+            // Si detail es un array, procesar cada error de validación
+            if (Array.isArray(errorData.detail)) {
+              const validationErrors = errorData.detail.map((err: any) => {
+                if (typeof err === "string") {
+                  return err;
+                } else if (err && typeof err === "object") {
+                  // Manejar errores de validación de Pydantic
+                  if (err.loc && err.msg) {
+                    const field = err.loc[err.loc.length - 1]; // Obtener el último elemento del path
+                    return `${field}: ${err.msg}`;
+                  } else if (err.msg) {
+                    return err.message;
+                  } else if (err.message) {
+                    return err.message;
+                  }
+                }
+                return JSON.stringify(err);
+              });
+              errorMessage = validationErrors.join(", ");
+            } else {
+              errorMessage = errorData.detail;
+            }
+          } else if (errorData.message) {
+            errorMessage = errorData.message;
+          } else if (errorData.error) {
+            errorMessage = errorData.error;
+          } else if (typeof errorData === "string") {
+            errorMessage = errorData;
+          } else if (Array.isArray(errorData)) {
+            errorMessage = errorData
+              .map((err) =>
+                typeof err === "string" ? err : JSON.stringify(err)
+              )
+              .join(", ");
+          }
+        } catch (parseError) {
+          console.log(
+            "⚠️ No se pudo parsear la respuesta de error:",
+            parseError
+          );
+        }
+
+        throw new Error(errorMessage);
+      }
+
+      const result = await response.json();
+      console.log("✅ Imagen agregada exitosamente:", result);
+
+      return {
+        success: true,
+        message: result.message || "Imagen agregada exitosamente",
+        personId: request.personId,
+        embeddingId: result.embedding_id || result.embeddingId,
+        processing_time_ms: result.processing_time_ms,
+      };
+    } catch (error) {
+      console.error("❌ Error agregando imagen a persona:", error);
+
+      let errorMessage = "Error desconocido";
+
+      if (error instanceof Error) {
+        errorMessage = error.message;
+      } else if (typeof error === "string") {
+        errorMessage = error;
+      } else if (error && typeof error === "object") {
+        errorMessage = JSON.stringify(error);
+      }
+
+      return {
+        success: false,
+        message: errorMessage,
+        error: errorMessage,
+      };
+    }
+  }
+
+  async getAllPersons(): Promise<GetAllPersonsResponse> {
+    try {
+      console.log("👥 Obteniendo todas las personas...");
+
+      // Obtener el token de autenticación de Supabase
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      if (!session?.access_token) {
+        throw new Error("No hay sesión activa");
+      }
+
+      // Realizar la petición al backend
+      console.log("🔐 Token que se envía:", {
+        tokenLength: session.access_token.length,
+        tokenPreview: `${session.access_token.substring(0, 50)}...`,
+        tokenEnd: `...${session.access_token.substring(session.access_token.length - 20)}`
+      });
+
+      const response = await fetch(
+        `${this.baseUrl}/api/v2/person-management/get-all-persons`,
+        {
+          method: "GET",
+          headers: {
+            'Authorization': `Bearer ${session.access_token}`,
+            'Content-Type': 'application/json'
+          },
+        }
+      );
+
+      console.log("📥 Respuesta del backend:", {
+        status: response.status,
+        statusText: response.statusText,
+        ok: response.ok,
+      });
+
+      if (!response.ok) {
+        let errorMessage = `Error ${response.status}: ${response.statusText}`;
+
+        try {
+          const errorData = await response.json();
+          console.log("📋 Datos de error del backend:", errorData);
+
+          if (errorData.detail) {
+            // Si detail es un array, procesar cada error de validación
+            if (Array.isArray(errorData.detail)) {
+              const validationErrors = errorData.detail.map((err: any) => {
+                if (typeof err === "string") {
+                  return err;
+                } else if (err && typeof err === "object") {
+                  // Manejar errores de validación de Pydantic
+                  if (err.loc && err.msg) {
+                    const field = err.loc[err.loc.length - 1]; // Obtener el último elemento del path
+                    return `${field}: ${err.msg}`;
+                  } else if (err.msg) {
+                    return err.msg;
+                  } else if (err.message) {
+                    return err.message;
+                  }
+                }
+                return JSON.stringify(err);
+              });
+              errorMessage = validationErrors.join(", ");
+            } else {
+              errorMessage = errorData.detail;
+            }
+          } else if (errorData.message) {
+            errorMessage = errorData.message;
+          } else if (errorData.error) {
+            errorMessage = errorData.error;
+          } else if (typeof errorData === "string") {
+            errorMessage = errorData;
+          } else if (Array.isArray(errorData)) {
+            errorMessage = errorData
+              .map((err) =>
+                typeof err === "string" ? err : JSON.stringify(err)
+              )
+              .join(", ");
+          }
+        } catch (parseError) {
+          console.log(
+            "⚠️ No se pudo parsear la respuesta de error:",
+            parseError
+          );
+        }
+
+        throw new Error(errorMessage);
+      }
+
+      const data = await response.json();
+      console.log("✅ Personas obtenidas exitosamente:", data);
+
+      return {
+        success: true,
+        data: data,
+        message: "Personas obtenidas exitosamente",
+      };
+    } catch (error) {
+      console.error("❌ Error obteniendo personas:", error);
+
+      let errorMessage = "Error desconocido";
+
+      if (error instanceof Error) {
+        errorMessage = error.message;
+      } else if (typeof error === "string") {
+        errorMessage = error;
+      } else if (error && typeof error === "object") {
+        errorMessage = JSON.stringify(error);
+      }
+
+      return {
+        success: false,
+        message: errorMessage,
+        error: errorMessage,
+             };
+     }
+   }
+
+   async getPersonById(personId: string): Promise<GetPersonByIdResponse> {
+     try {
+       console.log("👤 Obteniendo detalles de persona:", personId);
+
+       // Obtener el token de autenticación de Supabase
+       const {
+         data: { session },
+       } = await supabase.auth.getSession();
+       if (!session?.access_token) {
+         throw new Error("No hay sesión activa");
+       }
+
+       const response = await fetch(
+         `${this.baseUrl}/api/v2/person-management/get-person/${personId}`,
+         {
+           method: "GET",
+           headers: {
+             'Authorization': `Bearer ${session.access_token}`,
+             'Content-Type': 'application/json'
+           },
+         }
+       );
+
+       console.log("📥 Respuesta del backend:", {
+         status: response.status,
+         statusText: response.statusText,
+         ok: response.ok,
+       });
+
+       if (!response.ok) {
+         let errorMessage = `Error ${response.status}: ${response.statusText}`;
+
+         try {
+           const errorData = await response.json();
+           console.log("📋 Datos de error del backend:", errorData);
+
+           if (errorData.detail) {
+             if (Array.isArray(errorData.detail)) {
+               const validationErrors = errorData.detail.map((err: any) => {
+                 if (typeof err === "string") {
+                   return err;
+                 } else if (err && typeof err === "object") {
+                   if (err.loc && err.msg) {
+                     const field = err.loc[err.loc.length - 1];
+                     return `${field}: ${err.msg}`;
+                   } else if (err.msg) {
+                     return err.msg;
+                   } else if (err.message) {
+                     return err.message;
+                   }
+                 }
+                 return JSON.stringify(err);
+               });
+               errorMessage = validationErrors.join(", ");
+             } else {
+               errorMessage = errorData.detail;
+             }
+           } else if (errorData.message) {
+             errorMessage = errorData.message;
+           } else if (errorData.error) {
+             errorMessage = errorData.error;
+           } else if (typeof errorData === "string") {
+             errorMessage = errorData;
+           } else if (Array.isArray(errorData)) {
+             errorMessage = errorData
+               .map((err) =>
+                 typeof err === "string" ? err : JSON.stringify(err)
+               )
+               .join(", ");
+           }
+         } catch (parseError) {
+           console.log(
+             "⚠️ No se pudo parsear la respuesta de error:",
+             parseError
+           );
+         }
+
+         throw new Error(errorMessage);
+       }
+
+       const data = await response.json();
+       console.log("✅ Detalles de persona obtenidos exitosamente:", data);
+
+       return {
+         success: true,
+         data: data,
+         message: "Detalles de persona obtenidos exitosamente",
+       };
+     } catch (error) {
+       console.error("❌ Error obteniendo detalles de persona:", error);
+
+       let errorMessage = "Error desconocido";
+
+       if (error instanceof Error) {
+         errorMessage = error.message;
+       } else if (typeof error === "string") {
+         errorMessage = error;
+       } else if (error && typeof error === "object") {
+         errorMessage = JSON.stringify(error);
+       }
+
+       return {
+         success: false,
+         message: errorMessage,
+         error: errorMessage,
+       };
+     }
+   }
+ }
 
 // Instancia única del servicio
 export const peopleService = new PeopleService();

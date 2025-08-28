@@ -1,0 +1,352 @@
+.addImageToPersonForm {
+  width: 100%;
+  color: black!important;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 30px;
+  
+  .title {
+    font-size: 1.8rem;
+    font-weight: 600;
+    color: #2d3748;
+    margin: 0 0 10px 0;
+  }
+  
+  .subtitle {
+    font-size: 1rem;
+    color: #718096;
+    margin: 0 0 15px 0;
+    line-height: 1.5;
+  }
+  
+  .apiInfo {
+    font-size: 0.9rem;
+    color: #38a169;
+    background: #f0fff4;
+    padding: 10px 15px;
+    border-radius: 8px;
+    border: 1px solid #9ae6b4;
+    margin: 0;
+    
+    strong {
+      color: #2f855a;
+    }
+  }
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+}
+
+.formSection {
+  background: #f7fafc;
+  border-radius: 12px;
+  padding: 25px;
+  border: 1px solid #e2e8f0;
+  
+  .sectionTitle {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #2d3748;
+    margin: 0 0 20px 0;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #e2e8f0;
+  }
+}
+
+.formRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  
+  .label {
+    font-weight: 500;
+    color: #4a5568;
+    font-size: 0.95rem;
+    
+    .required {
+      color: #e53e3e;
+      font-weight: 600;
+    }
+  }
+  
+  .input {
+    padding: 12px 16px;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: all 0.2s ease;
+    background: white !important;
+    color: #2d3748 !important;
+    cursor: text !important;
+    pointer-events: auto !important;
+    user-select: text !important;
+    display: block !important;
+    width: 100% !important;
+    min-height: 44px !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    position: relative !important;
+    z-index: 1 !important;
+    
+    &:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+    
+    &:disabled {
+      background: #f7fafc;
+      color: #a0aec0;
+      cursor: not-allowed;
+    }
+  }
+  
+  .helpText {
+    font-size: 0.85rem;
+    color: #718096;
+    font-style: italic;
+  }
+}
+
+.imageUploadSection {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.dropZone {
+  border: 3px dashed #cbd5e0;
+  border-radius: 12px;
+  padding: 40px 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: white;
+  position: relative;
+  overflow: hidden;
+  
+  &:hover {
+    border-color: #667eea;
+    background: #f7fafc;
+  }
+  
+  &.dragOver {
+    border-color: #667eea;
+    background: #edf2f7;
+    transform: scale(1.02);
+  }
+}
+
+.dropZoneContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+  
+  .dropZoneIcon {
+    font-size: 3rem;
+    color: #a0aec0;
+  }
+  
+  .dropZoneText {
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: #4a5568;
+    margin: 0;
+  }
+  
+  .dropZoneSubtext {
+    font-size: 0.9rem;
+    color: #718096;
+    margin: 0;
+  }
+}
+
+.imagePreview {
+  position: relative;
+  display: inline-block;
+  
+  img {
+    max-width: 100%;
+    max-height: 200px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+  
+  .imageOverlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    
+    span {
+      font-weight: 500;
+      font-size: 0.9rem;
+    }
+  }
+  
+  &:hover .imageOverlay {
+    opacity: 1;
+  }
+}
+
+.hiddenInput {
+  display: none;
+}
+
+.imageInfo {
+  background: #edf2f7;
+  border-radius: 8px;
+  padding: 15px;
+  border: 1px solid #e2e8f0;
+  
+  p {
+    margin: 5px 0;
+    font-size: 0.9rem;
+    color: #4a5568;
+  }
+  
+  .removeImageButton {
+    margin-top: 10px;
+    padding: 8px 16px;
+    background: #fed7d7;
+    color: #c53030;
+    border: 1px solid #feb2b2;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    transition: all 0.2s ease;
+    
+    &:hover:not(:disabled) {
+      background: #feb2b2;
+      border-color: #fc8181;
+    }
+    
+    &:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+  }
+}
+
+.formActions {
+  display: flex;
+  gap: 15px;
+  justify-content: flex-end;
+  padding-top: 20px;
+  border-top: 1px solid #e2e8f0;
+  
+  @media (max-width: 768px) {
+    flex-direction: column-reverse;
+  }
+}
+
+.cancelButton {
+  padding: 12px 24px;
+  background: #e2e8f0;
+  color: #4a5568;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  
+  &:hover:not(:disabled) {
+    background: #cbd5e0;
+  }
+  
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+.submitButton {
+  padding: 12px 24px;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  
+  &:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+  }
+  
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+  }
+}
+
+.loadingSpinner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  
+  .spinner {
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-top: 2px solid white;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.errorMessage {
+  background: #fed7d7;
+  color: #c53030;
+  padding: 15px;
+  border-radius: 8px;
+  border: 1px solid #feb2b2;
+  font-size: 0.95rem;
+  text-align: center;
+}
+
+.successMessage {
+  background: #c6f6d5;
+  color: #2f855a;
+  padding: 15px;
+  border-radius: 8px;
+  border: 1px solid #9ae6b4;
+  font-size: 0.95rem;
+  text-align: center;
+}

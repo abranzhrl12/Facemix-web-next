@@ -3,10 +3,10 @@
 import React from 'react';
 import { useRouter } from 'next/navigation';
 import { useRequireAuth } from '@/shared/hooks/useRequireAuth';
-import PersonRegistrationForm from '@/features/people/components/PersonRegistrationForm';
+import AddImageToPersonForm from '@/features/people/components/AddImageToPersonForm';
 import styles from './page.module.scss';
 
-export default function PersonRegistrationPage() {
+export default function AddImageToPersonPage() {
   const router = useRouter();
   const { isAuthenticated, loading } = useRequireAuth();
 
@@ -23,28 +23,25 @@ export default function PersonRegistrationPage() {
     return null; // El hook se encargará de la redirección
   }
 
-  const handleRegistrationSuccess = (personId: string) => {
-    console.log('✅ Persona registrada exitosamente:', personId);
-    // Aquí podrías redirigir a una página de éxito o al dashboard
-    // Por ahora solo mostramos un mensaje
-    alert(`🎉 ¡Persona registrada exitosamente!\n\nID: ${personId}\n\nLa persona ha sido registrada en el sistema de reconocimiento facial.`);
+  const handleImageAddedSuccess = (personId: string, embeddingId: string) => {
+    console.log('✅ Imagen agregada exitosamente:', { personId, embeddingId });
+    alert(`🎉 ¡Imagen agregada exitosamente!\n\nID de Persona: ${personId}\nID de Embedding: ${embeddingId}\n\nLa nueva imagen ha sido procesada y agregada al sistema de reconocimiento facial.`);
   };
 
   const handleCancel = () => {
-    // Redirigir a home
     router.push('/home');
   };
 
   return (
-    <div className={styles.personRegistrationPage}>
+    <div className={styles.addImagePage}>
       <div className={styles.container}>
         <div className={styles.header}>
           <h1>FaceMix</h1>
           <p>Sistema de Reconocimiento Facial</p>
         </div>
         
-        <PersonRegistrationForm
-          onSuccess={handleRegistrationSuccess}
+        <AddImageToPersonForm
+          onSuccess={handleImageAddedSuccess}
           onCancel={handleCancel}
         />
       </div>

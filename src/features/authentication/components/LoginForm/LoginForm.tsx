@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../hooks/useAuth';
 import styles from './LoginForm.module.scss';
 
@@ -15,7 +15,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
   onSwitchToSignUp,
   className = '',
 }) => {
-  const { signIn, loading, error, user } = useAuth();
+  const { signIn, loading, error, user, session } = useAuth();
   
   const [formData, setFormData] = useState({
     email: '',
@@ -23,6 +23,19 @@ export const LoginForm: React.FC<LoginFormProps> = ({
   });
 
   const [showPassword, setShowPassword] = useState(false);
+
+  // Efecto para detectar cuando el usuario se autentica exitosamente
+  useEffect(() => {
+    if (user && session && !loading) {
+      console.log('🎯 LoginForm detectó usuario autenticado, llamando onSuccess');
+      // Usar setTimeout para evitar llamadas múltiples
+      const timer = setTimeout(() => {
+        onSuccess?.();
+      }, 100);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [user, session, loading, onSuccess]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -46,23 +59,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
       
       await signIn(formData.email, formData.password);
       
-      console.log('🔄 signIn completado, verificando estado...');
-      console.log('📊 Estado actual:', { 
-        error: error?.message || 'sin error', 
-        loading, 
-        user: !!user,
-        userEmail: user?.email || 'sin usuario'
-      });
-      
-      // Solo llamar onSuccess si no hay error y hay un usuario
-      if (!error && user) {
-        console.log('✅ Login exitoso en formulario, llamando onSuccess');
-        onSuccess?.();
-      } else {
-        console.log('❌ Login falló, NO llamando onSuccess');
-        console.log('❌ Error específico:', error?.message);
-        console.log('❌ Usuario disponible:', !!user);
-      }
+      console.log('🔄 signIn completado, la redirección se maneja automáticamente');
     } catch (error) {
       console.error('💥 Error inesperado en formulario:', error);
     }

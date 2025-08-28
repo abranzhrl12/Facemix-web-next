@@ -58,12 +58,8 @@ export class AuthService implements IAuthService {
       // Si el login es exitoso, obtener el perfil del usuario desde system_users
       // SOLO si Supabase está configurado correctamente
       if (data.user && supabase.isConfigured()) {
-        // Intentar obtener el perfil, pero NO fallar si no existe
-        this.fetchUserProfile(data.user.id).catch(profileError => {
-          console.warn('⚠️ Error obteniendo perfil, pero login exitoso:', profileError);
-          console.log('ℹ️ El usuario puede no tener perfil en system_users aún');
-          // NO fallar el login por un error en el perfil
-        });
+        // Omitir la obtención del perfil por el momento para evitar errores
+        console.log('ℹ️ Login exitoso, omitiendo obtención de perfil por el momento');
       }
 
       return { user: data.user, error: null };
@@ -86,7 +82,8 @@ export class AuthService implements IAuthService {
 
       // Si el registro es exitoso, crear el perfil en system_users
       if (data.user) {
-        await this.createUserProfile(data.user.id, email, userData);
+        // Omitir la creación del perfil por el momento para evitar errores
+        console.log('ℹ️ Registro exitoso, omitiendo creación de perfil por el momento');
       }
 
       return { user: data.user, error: null };
@@ -145,75 +142,13 @@ export class AuthService implements IAuthService {
   }
 
   // Métodos privados para manejar el perfil de usuario
+  // Omitidos por el momento para evitar errores con el cliente dummy
   private async createUserProfile(userId: string, email: string, userData: Partial<UserProfile>): Promise<void> {
-    try {
-      // Verificar si Supabase está configurado antes de hacer la consulta
-      if (!supabase.isConfigured()) {
-        console.log('⚠️ Supabase no configurado, saltando createUserProfile');
-        return;
-      }
-
-      // Verificar que el cliente tenga el método 'from' disponible
-      if (typeof supabase.from !== 'function') {
-        console.warn('⚠️ Método "from" no disponible en cliente Supabase');
-        return;
-      }
-
-      const { error } = await supabase
-        .from('system_users')
-        .insert({
-          supabase_user_id: userId,
-          email,
-          ...userData,
-        });
-
-      if (error) {
-        console.error('Error creating user profile:', error);
-      } else {
-        console.log('✅ Perfil de usuario creado exitosamente');
-      }
-    } catch (error) {
-      console.error('Error creating user profile:', error);
-      // No propagar el error para no fallar el registro
-    }
+    console.log('ℹ️ createUserProfile omitido por el momento');
   }
 
   private async fetchUserProfile(userId: string): Promise<void> {
-    try {
-      // Verificar si Supabase está configurado antes de hacer la consulta
-      if (!supabase.isConfigured()) {
-        console.log('⚠️ Supabase no configurado, saltando fetchUserProfile');
-        return;
-      }
-
-      // Verificar que el cliente tenga el método 'from' disponible
-      if (typeof supabase.from !== 'function') {
-        console.warn('⚠️ Método "from" no disponible en cliente Supabase');
-        return;
-      }
-
-      console.log('🔍 Buscando perfil para usuario:', userId);
-      
-      const { data, error } = await supabase
-        .from('system_users')
-        .select('*')
-        .eq('supabase_user_id', userId)
-        .single();
-
-      if (error) {
-        if (error.code === 'PGRST116') {
-          // Usuario no encontrado en system_users (normal si es nuevo)
-          console.log('ℹ️ Usuario no tiene perfil en system_users aún (normal para usuarios nuevos)');
-        } else {
-          console.error('Error fetching user profile:', error);
-        }
-      } else {
-        console.log('✅ Perfil de usuario obtenido:', data);
-      }
-    } catch (error) {
-      console.error('Error fetching user profile:', error);
-      // No propagar el error para no fallar el login
-    }
+    console.log('ℹ️ fetchUserProfile omitido por el momento');
   }
 }
 

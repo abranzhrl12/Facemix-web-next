@@ -3,17 +3,16 @@
 import React, { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/features/authentication/hooks/useAuth';
-import LoginForm from '@/features/authentication/components/LoginForm';
 import styles from './page.module.scss';
 
-export default function LoginPage() {
+export default function SignUpPage() {
   const router = useRouter();
   const { user, session, loading } = useAuth();
 
-  // Efecto para detectar cuando el usuario se autentica exitosamente
+  // Efecto para detectar cuando el usuario se registra exitosamente
   useEffect(() => {
     if (user && session && !loading) {
-      console.log('🎯 Usuario autenticado detectado en LoginPage, redirigiendo a /home');
+      console.log('🎯 Usuario registrado detectado en SignUpPage, redirigiendo a /home');
       // Usar setTimeout para evitar redirecciones múltiples
       const timer = setTimeout(() => {
         router.replace('/home');
@@ -23,18 +22,13 @@ export default function LoginPage() {
     }
   }, [user, session, loading, router]);
 
-  const handleLoginSuccess = () => {
-    console.log('🎯 handleLoginSuccess llamado - redirigiendo a home');
-    console.log('🎯 URL actual:', window.location.href);
-    console.log('🎯 Redirigiendo a /home');
-    
-    // Redirigir a home después del login exitoso
-    router.push('/home');
+  const handleSignUpSuccess = () => {
+    console.log('🎯 handleSignUpSuccess llamado');
+    // La redirección se maneja automáticamente por el useEffect
   };
 
-  const handleSwitchToSignUp = () => {
-    // Redirigir a la página de registro
-    router.push('/signup');
+  const handleSwitchToLogin = () => {
+    router.push('/login');
   };
 
   return (
@@ -45,10 +39,16 @@ export default function LoginPage() {
           <p>Sistema de Reconocimiento Facial</p>
         </div>
         
-        <LoginForm
-          onSuccess={handleLoginSuccess}
-          onSwitchToSignUp={handleSwitchToSignUp}
-        />
+        <div className={styles.form}>
+          <h2>Crear Cuenta</h2>
+          <p>Esta funcionalidad estará disponible pronto.</p>
+          <button 
+            onClick={handleSwitchToLogin}
+            className={styles.primaryButton}
+          >
+            Ir al Login
+          </button>
+        </div>
       </div>
     </div>
   );
